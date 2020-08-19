@@ -1,4 +1,5 @@
 import '../vendor/element/index.css'
+import './main.css'
 import Vue from 'vue'
 import ElementUI from 'element-ui'
 import App from './App.vue'
