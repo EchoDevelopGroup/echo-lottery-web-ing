@@ -9,8 +9,21 @@ import request from './request'
  */
 
 /**
+ * @typedef MemberInfoCommit
+ * @property {string} uid 用户ID
+ */
+
+/**
  * @typedef MemberInfoShort
  * @property {string} uid 用户ID
+ * @property {string} user_name 用户名
+ * @property {string} user_icon 用户头像
+ */
+
+/**
+ * @typedef MemberScheduleResponse
+ * @property {MemberInfoShort[]} done_list 已完成列表
+ * @property {MemberInfoShort[]} undone_list 未完成列表
  */
 
 /**
@@ -22,16 +35,16 @@ function now() {
 
 /**
  * 开始弹幕抽奖
- * @param {string} keyword 抽奖弹幕
+ * @param {string} attendKeyword 抽奖弹幕
  * @param {number} medalLevel 粉丝牌等级
  */
-export function startProcess(keyword, medalLevel) {
+export function startProcess(attendKeyword, medalLevel) {
   return request({
     url: '/lottery/start',
     method: 'post',
     data: {
       timestamp: now(),
-      keyword,
+      keyword: attendKeyword,
       medal_level: medalLevel
     },
     auth: true
@@ -54,6 +67,7 @@ export function stopProcess() {
 
 /**
  * 获取抽奖参与者名单
+ * @return {Promise<MemberInfo[]>}
  */
 export function getLotteryMemberList() {
   return request({
@@ -64,15 +78,21 @@ export function getLotteryMemberList() {
 
 /**
  * 执行开奖过程(大逃杀)
- * @param {number} championNum 存活个数
- * @param {MemberInfoShort[]} acceptableMemberList 从这些人里面筛
+ * @param {number} lotteryPattern 抽奖模式 0=普通 1=头像
+ * @param {number} championNumber 存活个数
+ * @param {MemberInfoCommit[]} acceptableMemberList 从这些人里面筛
  */
-export function processBattle(championNum, acceptableMemberList) {
+export function processBattle(
+  lotteryPattern,
+  championNumber,
+  acceptableMemberList
+) {
   return request({
     url: '/lottery/start',
     method: 'post',
     data: {
-      champion_num: championNum,
+      lottery_pattern: lotteryPattern,
+      champion_num: championNumber,
       member_data: acceptableMemberList
     },
     auth: true
@@ -81,7 +101,7 @@ export function processBattle(championNum, acceptableMemberList) {
 
 /**
  * 提交已画完的头像的人的信息
- * @param {MemberInfoShort[]} finishedMemberList 这些人的头像画完了
+ * @param {MemberInfoCommit[]} finishedMemberList 这些人的头像画完了
  */
 export function commitMemberSchedule(finishedMemberList) {
   return request({
@@ -96,6 +116,7 @@ export function commitMemberSchedule(finishedMemberList) {
 
 /**
  * 获取舰长头像完成进度
+ * @returns {Promise<MemberScheduleResponse>}
  */
 export function getMemberSchedule() {
   return request({

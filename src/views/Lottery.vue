@@ -10,16 +10,16 @@
 
     <div class="lottery-main">
       <span class="lottery-main-command-display"
-        ><b>参与指令</b>: {{ cmd }}</span
+        ><b>参与指令</b>: {{ config.attendKeyword }}</span
       >
       <lottery-box class="lottery-main-lottery"></lottery-box>
       <task-box class="lottery-main-done-list"></task-box>
       <task-box class="lottery-main-undone-list"></task-box>
-      <config-box class="lottery-main-config"></config-box>
-      <!-- <div class="test">
-        <img class="test2" src="@/assets/task-box-2.png" alt="" />
-        <img class="test3" src="@/assets/task-box-2.png" alt="" />
-      </div> -->
+
+      <!-- 左侧的配置框 -->
+      <config-box class="lottery-main-config">
+        <config-control v-model="config"></config-control>
+      </config-box>
     </div>
   </div>
 </template>
@@ -29,6 +29,7 @@ import LotteryBackground from '@/components/LotteryBackground'
 import TaskBox from '@/components/TaskBox'
 import ConfigBox from '@/components/ConfigBox'
 import LotteryBox from '@/components/LotteryBox'
+import ConfigControl from '@/components/ConfigControl'
 
 export default {
   name: 'Lottery',
@@ -36,11 +37,17 @@ export default {
     LotteryBackground,
     TaskBox,
     ConfigBox,
-    LotteryBox
+    LotteryBox,
+    ConfigControl
   },
   data() {
     return {
-      cmd: 'Echo'
+      config: {
+        lotteryPattern: 1,
+        championNumber: 8,
+        attendKeyword: 'Echo',
+        medalLevel: 5
+      }
     }
   }
 }
