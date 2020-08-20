@@ -18,7 +18,6 @@ export default {
 
 <style>
 .task-box {
-  position: relative;
   width: 492px;
   height: 317px;
   background-image: url('~@/assets/task-box.png');

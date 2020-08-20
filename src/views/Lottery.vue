@@ -8,8 +8,18 @@
       </div>
     </lottery-background>
 
-    <div class="main">
-      <task-box></task-box>
+    <div class="lottery-main">
+      <span class="lottery-main-command-display"
+        ><b>参与指令</b>: {{ cmd }}</span
+      >
+      <lottery-box class="lottery-main-lottery"></lottery-box>
+      <task-box class="lottery-main-done-list"></task-box>
+      <task-box class="lottery-main-undone-list"></task-box>
+      <config-box class="lottery-main-config"></config-box>
+      <!-- <div class="test">
+        <img class="test2" src="@/assets/task-box-2.png" alt="" />
+        <img class="test3" src="@/assets/task-box-2.png" alt="" />
+      </div> -->
     </div>
   </div>
 </template>
@@ -17,12 +27,21 @@
 <script>
 import LotteryBackground from '@/components/LotteryBackground'
 import TaskBox from '@/components/TaskBox'
+import ConfigBox from '@/components/ConfigBox'
+import LotteryBox from '@/components/LotteryBox'
 
 export default {
   name: 'Lottery',
   components: {
     LotteryBackground,
-    TaskBox
+    TaskBox,
+    ConfigBox,
+    LotteryBox
+  },
+  data() {
+    return {
+      cmd: 'Echo'
+    }
   }
 }
 </script>
@@ -44,8 +63,48 @@ export default {
   font-size: 40px;
   font-family: 'zhscnmt';
 }
-.main {
-  position: relative;
+.lottery-main {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 100;
+}
+
+.lottery-main-lottery {
+  position: absolute;
+  z-index: 101;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+.lottery-main-done-list {
+  position: absolute;
+  z-index: 102;
+  left: calc(50vw + 446px);
+  top: calc(50vh - 353px);
+}
+.lottery-main-undone-list {
+  position: absolute;
+  z-index: 102;
+  left: calc(50vw + 536px);
+  top: calc(50vh);
+}
+.lottery-main-config {
+  position: absolute;
+  z-index: 103;
+  left: calc(50vw - 781px);
+  top: calc(50vh - 305px);
+}
+.lottery-main-command-display {
+  position: absolute;
+  z-index: 101;
+  left: calc((100vw - 1028px) / 2);
+  top: calc((100vh - 828px) / 2 - 50px);
+  font-family: 'zhscnmt';
+  font-size: 40px;
 }
 </style>
