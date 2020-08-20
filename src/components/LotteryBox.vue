@@ -1,5 +1,7 @@
 <template>
-  <div class="lottery-box"></div>
+  <div class="lottery-box">
+    <slot></slot>
+  </div>
 </template>
 
 <script>

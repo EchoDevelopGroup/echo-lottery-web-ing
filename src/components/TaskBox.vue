@@ -6,7 +6,9 @@
     <span class="task-box-title">舰长头像-已完成</span>
 
     <!-- 中间的人物显示区 -->
-    <div class="task-box-main"></div>
+    <div class="task-box-main">
+      <slot></slot>
+    </div>
   </div>
 </template>
 

@@ -12,7 +12,31 @@
       <span class="lottery-main-command-display"
         ><b>参与指令</b>: {{ config.attendKeyword }}</span
       >
-      <lottery-box class="lottery-main-lottery"></lottery-box>
+      <lottery-box class="lottery-main-lottery">
+        <!-- 登录成功后的页面 -->
+        <div v-if="isLogin">
+          <p>欢迎使用桃抽奖</p>
+        </div>
+
+        <!-- 登录页面 -->
+        <div v-else>
+          <el-input
+            type="primary"
+            v-model="login.username"
+            placeholder="用户名"
+          ></el-input>
+          <el-input
+            type="primary"
+            v-model="login.password"
+            placeholder="密码"
+          ></el-input>
+
+          <el-button type="primary" @click="handleLogin" :loading="loginLoading"
+            >登录</el-button
+          >
+        </div>
+      </lottery-box>
+
       <task-box class="lottery-main-done-list"></task-box>
       <task-box class="lottery-main-undone-list"></task-box>
 
@@ -30,6 +54,8 @@ import TaskBox from '@/components/TaskBox'
 import ConfigBox from '@/components/ConfigBox'
 import LotteryBox from '@/components/LotteryBox'
 import ConfigControl from '@/components/ConfigControl'
+import * as api from '@/api'
+import { mapMutations } from 'vuex'
 
 export default {
   name: 'Lottery',
@@ -42,12 +68,39 @@ export default {
   },
   data() {
     return {
+      isLogin: false,
+      loginLoading: false,
       config: {
         lotteryPattern: 1,
         championNumber: 8,
         attendKeyword: 'Echo',
         medalLevel: 5
+      },
+      login: {
+        username: '',
+        password: ''
       }
+    }
+  },
+  methods: {
+    ...mapMutations({
+      setUsername: 'setUsername',
+      setPassword: 'setPassword'
+    }),
+    async handleLogin() {
+      this.loginLoading = true
+      try {
+        const { username, password } = this.login
+        await api.login(username, password)
+        this.setUsername(username)
+        this.setPassword(password)
+        this.isLogin = true
+        this.$message.success('登录成功')
+      } catch (err) {
+        console.error('[Lottery/handleLoine]', err)
+        this.$message.error('登录失败: ' + err.message)
+      }
+      this.loginLoading = false
     }
   }
 }
@@ -87,6 +140,7 @@ export default {
   left: 0;
   bottom: 0;
   right: 0;
+  color: #fff;
 }
 .lottery-main-done-list {
   position: absolute;
