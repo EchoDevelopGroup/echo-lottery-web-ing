@@ -29,7 +29,7 @@ import request from './request'
 /**
  * 返回当前时间的秒级时间戳
  */
-function now() {
+export function now() {
   return Math.floor(new Date().getTime() / 1000)
 }
 
@@ -43,7 +43,7 @@ export function startProcess(attendKeyword, medalLevel) {
     url: '/lottery/start',
     method: 'post',
     data: {
-      timestamp: now(),
+      timestamp: '',
       keyword: attendKeyword,
       medal_level: medalLevel
     },
@@ -59,7 +59,7 @@ export function stopProcess() {
     url: '/lottery/stop',
     method: 'post',
     data: {
-      timestamp: now()
+      timestamp: ''
     },
     auth: true
   })

@@ -11,6 +11,8 @@ Vue.use(ElementUI)
 
 Vue.config.productionTip = false
 
+api.request.auth.getter = store.getters
+
 const app = new Vue({
   router,
   store,

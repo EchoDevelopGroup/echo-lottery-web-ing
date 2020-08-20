@@ -8,10 +8,18 @@ const _axios = axios.create({
 _axios.auth = {
   getter: null,
   get username() {
-    return this.getter ? this.getter.username : ''
+    const v = this.getter ? this.getter.username : ''
+    if (!v) {
+      console.error('Unauthorized request username =', v)
+    }
+    return v
   },
   get password() {
-    return this.getter ? this.getter.password : ''
+    const v = this.getter ? this.getter.password : ''
+    if (!v) {
+      console.error('Unauthorized request password =', v)
+    }
+    return v
   }
 }
 
@@ -19,9 +27,10 @@ _axios.auth = {
 _axios.interceptors.request.use(
   config => {
     if (config.auth) {
-      config.admin_name = _axios.auth.username
-      config.admin_password = _axios.auth.password
+      config.data.admin_name = _axios.auth.username
+      config.data.admin_password = _axios.auth.password
     }
+    return config
   },
   error => {
     return Promise.reject(error)
