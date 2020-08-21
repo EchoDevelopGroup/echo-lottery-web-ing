@@ -42,3 +42,22 @@ export function iterateModifyNeedleCount(str, needle, mod, offset) {
   const newLen = ((lastLen + 1) % mod) + offset
   return removeLastChars(str, needle) + needle.repeat(newLen)
 }
+
+/**
+ * 把URL转成代理后的URL
+ * @param {string} url B站头像URL
+ */
+export function changeBilibiliImageToProxy(url) {
+  if (!url) {
+    return url
+  }
+  const groups = /^https?:\/\/(i\d)\.hdslb.com\/(.*)/.exec(url)
+  if (groups) {
+    const domain = groups[1]
+    const path = groups[2]
+    return `/hdslb-${domain}/${path}`
+  } else {
+    console.warn('[Proxy] url 无法识别: ', url)
+    return url
+  }
+}

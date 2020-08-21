@@ -96,6 +96,7 @@ import UserItem from '@/components/UserItem'
 import StartStopButton from '@/components/StartStopButton'
 import * as api from '@/api'
 import { mapMutations } from 'vuex'
+import { changeBilibiliImageToProxy } from '@/util'
 
 // 消息加载状态下最多几个点
 const DOT_COUNT_MOD = 3
@@ -293,7 +294,14 @@ export default {
     async loadMembers() {
       try {
         const members = await api.getLotteryMemberList()
-        this.members = members
+        if (members) {
+          this.members = members.map(item => {
+            return {
+              ...item,
+              user_icon: changeBilibiliImageToProxy(item.user_icon)
+            }
+          })
+        }
       } catch (err) {
         console.error(err)
         this.addMessage(
