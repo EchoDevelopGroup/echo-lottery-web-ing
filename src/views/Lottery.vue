@@ -15,6 +15,13 @@
         ><b>参与指令</b>: {{ config.attendKeyword }}</span
       >
 
+      <!-- 左侧的开始停止按钮 -->
+      <start-stop-button
+        class="lottery-main-action-button"
+        @start="handleStart"
+        @stop="handleStop"
+      ></start-stop-button>
+
       <!-- 中心框和其内部 -->
       <lottery-box class="lottery-main-lottery">
         <!-- 顶部的消息框 黑色部分 -->
@@ -84,6 +91,7 @@ import ConfigBox from '@/components/ConfigBox'
 import LotteryBox from '@/components/LotteryBox'
 import ConfigControl from '@/components/ConfigControl'
 import UserItem from '@/components/UserItem'
+import StartStopButton from '@/components/StartStopButton'
 import * as api from '@/api'
 import { mapMutations } from 'vuex'
 
@@ -95,7 +103,8 @@ export default {
     ConfigBox,
     LotteryBox,
     ConfigControl,
-    UserItem
+    UserItem,
+    StartStopButton
   },
   data() {
     return {
@@ -118,6 +127,7 @@ export default {
       setUsername: 'setUsername',
       setPassword: 'setPassword'
     }),
+    // 登录
     async handleLogin() {
       this.loginLoading = true
       try {
@@ -132,6 +142,14 @@ export default {
         this.$message.error('登录失败: ' + err.message)
       }
       this.loginLoading = false
+    },
+    // 开始
+    handleStart() {
+      console.log('start')
+    },
+    // 结束
+    handleStop() {
+      console.log('stop')
     }
   }
 }
@@ -199,6 +217,13 @@ export default {
   font-family: 'zhscnmt', 'Helvetica Neue', Helvetica, 'PingFang SC',
     'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
   font-size: 40px;
+}
+
+.lottery-main-action-button {
+  position: absolute;
+  z-index: 104;
+  left: calc(50vw - 807px);
+  top: calc(50vh - 200px);
 }
 
 .lottery-main-message {
