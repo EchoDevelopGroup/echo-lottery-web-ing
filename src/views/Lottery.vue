@@ -8,35 +8,64 @@
       </div>
     </lottery-background>
 
+    <!-- 全局居中的主题框 -->
     <div class="lottery-main">
+      <!-- 中心框上方的参与指令 -->
       <span class="lottery-main-command-display"
         ><b>参与指令</b>: {{ config.attendKeyword }}</span
       >
+
+      <!-- 中心框和其内部 -->
       <lottery-box class="lottery-main-lottery">
-        <!-- 登录成功后的页面 -->
-        <div v-if="isLogin">
-          <p>欢迎使用桃抽奖</p>
-        </div>
+        <!-- 顶部的消息框 黑色部分 -->
+        <template #message>
+          <div class="lottery-main-message">
+            <p>sss</p>
+            <p>sss</p>
+            <p>sss</p>
+          </div>
+        </template>
 
-        <!-- 登录页面 -->
-        <div v-else>
-          <el-input
-            type="primary"
-            v-model="login.username"
-            placeholder="用户名"
-          ></el-input>
-          <el-input
-            type="primary"
-            v-model="login.password"
-            placeholder="密码"
-          ></el-input>
+        <!-- 底部的粉色框 显示人员信息 -->
+        <template #default>
+          <!-- 登录成功后的页面 -->
+          <div v-if="isLogin">
+            <ul class="lottery-main-users">
+              <user-item></user-item>
+              <user-item></user-item>
+              <user-item></user-item>
+              <user-item></user-item>
+              <user-item></user-item>
+              <user-item></user-item>
+              <user-item></user-item>
+              <user-item></user-item>
+            </ul>
+          </div>
 
-          <el-button type="primary" @click="handleLogin" :loading="loginLoading"
-            >登录</el-button
-          >
-        </div>
+          <!-- 登录页面 -->
+          <div v-else>
+            <el-input
+              type="primary"
+              v-model="login.username"
+              placeholder="用户名"
+            ></el-input>
+            <el-input
+              type="primary"
+              v-model="login.password"
+              placeholder="密码"
+            ></el-input>
+
+            <el-button
+              type="primary"
+              @click="handleLogin"
+              :loading="loginLoading"
+              >登录</el-button
+            >
+          </div>
+        </template>
       </lottery-box>
 
+      <!-- 右侧的两个人框 -->
       <task-box class="lottery-main-done-list"></task-box>
       <task-box class="lottery-main-undone-list"></task-box>
 
@@ -54,6 +83,7 @@ import TaskBox from '@/components/TaskBox'
 import ConfigBox from '@/components/ConfigBox'
 import LotteryBox from '@/components/LotteryBox'
 import ConfigControl from '@/components/ConfigControl'
+import UserItem from '@/components/UserItem'
 import * as api from '@/api'
 import { mapMutations } from 'vuex'
 
@@ -64,11 +94,12 @@ export default {
     TaskBox,
     ConfigBox,
     LotteryBox,
-    ConfigControl
+    ConfigControl,
+    UserItem
   },
   data() {
     return {
-      isLogin: false,
+      isLogin: true,
       loginLoading: false,
       config: {
         lotteryPattern: 1,
@@ -158,14 +189,29 @@ export default {
   position: absolute;
   z-index: 103;
   left: calc(50vw - 781px);
-  top: calc(50vh - 305px);
+  top: calc(50vh - 485px);
 }
 .lottery-main-command-display {
   position: absolute;
   z-index: 101;
-  left: calc((100vw - 1028px) / 2);
+  left: calc((100vw - 1028px) / 2 + 80px);
   top: calc((100vh - 828px) / 2 - 50px);
-  font-family: 'zhscnmt';
+  font-family: 'zhscnmt', 'Helvetica Neue', Helvetica, 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
   font-size: 40px;
+}
+
+.lottery-main-message {
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+  padding: 8px;
+}
+
+.lottery-main-users {
+  height: 400px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: 15px;
 }
 </style>
