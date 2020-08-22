@@ -22,6 +22,9 @@
         @stop="handleStop"
       ></start-stop-button>
 
+      <!-- 处刑按钮 -->
+      <execute-button class="lottery-main-execute-button"></execute-button>
+
       <!-- 中心框和其内部 -->
       <lottery-box class="lottery-main-lottery">
         <!-- 顶部的消息框 黑色部分 -->
@@ -94,6 +97,7 @@ import LotteryBox from '@/components/LotteryBox'
 import ConfigControl from '@/components/ConfigControl'
 import UserItem from '@/components/UserItem'
 import StartStopButton from '@/components/StartStopButton'
+import ExecuteButton from '@/components/ExecuteButton'
 import * as api from '@/api'
 import { mapMutations } from 'vuex'
 import { changeBilibiliImageToProxy } from '@/util'
@@ -105,6 +109,10 @@ const MAX_MESSAGE_DISPLAY = 3
 // 多于多少个人显示较小的视图 参数必须和后端匹配
 const MAX_FULL_DISPLAY_PEOPLE_NUMBER = 8
 
+const MEMBERS_INIT = JSON.parse(
+  '[{"uid":"212648615","user_name":"咩桃影","user_icon":"","lottery_status":0},{"uid":"695634","user_name":"扶他小M","user_icon":"","lottery_status":0},{"uid":"34159970","user_name":"沉默的繁忙","user_icon":"","lottery_status":0},{"uid":"289674291","user_name":"ouxuoooo","user_icon":"","lottery_status":2},{"uid":"3514566","user_name":"心情链环","user_icon":"","lottery_status":0},{"uid":"10697044","user_name":"灼眼的萌王夏娜","user_icon":"","lottery_status":0},{"uid":"24089544","user_name":"团不过_团灭了","user_icon":"","lottery_status":2},{"uid":"8559982","user_name":"勿相忘隽于心","user_icon":"","lottery_status":0},{"uid":"4613957","user_name":"苏叔叔速塑疏松熟薯酥","user_icon":"","lottery_status":0},{"uid":"6035511","user_name":"丶米穗","user_icon":"","lottery_status":1},{"uid":"9345046","user_name":"输入了新昵称","user_icon":"","lottery_status":2},{"uid":"1595229","user_name":"C丶Silver","user_icon":"","lottery_status":2},{"uid":"210691","user_name":"蜜曜喵","user_icon":"","lottery_status":0},{"uid":"28355088","user_name":"傻乳鸽","user_icon":"","lottery_status":0},{"uid":"58121","user_name":"lon2046","user_icon":"","lottery_status":0},{"uid":"15155633","user_name":"愉悦少年k","user_icon":"","lottery_status":0},{"uid":"11160865","user_name":"阿古罗拉·晓·古城","user_icon":"","lottery_status":2},{"uid":"243838983","user_name":"Naaaaaaaaaaakiri","user_icon":"","lottery_status":2},{"uid":"2611767","user_name":"时龙与绝舞","user_icon":"","lottery_status":0},{"uid":"4423737","user_name":"四時Shijz-","user_icon":"","lottery_status":0},{"uid":"10329974","user_name":"雪原之风","user_icon":"","lottery_status":0},{"uid":"283047178","user_name":"Oliverwantsmore","user_icon":"","lottery_status":0},{"uid":"131652679","user_name":"萧山爱桃雪音花雨蒜钳","user_icon":"","lottery_status":2},{"uid":"8791804","user_name":"幽冥侍女","user_icon":"","lottery_status":2},{"uid":"64773327","user_name":"赤-鸢","user_icon":"","lottery_status":0},{"uid":"66909954","user_name":"林卿旦","user_icon":"","lottery_status":0},{"uid":"383568","user_name":"古明地狱三头犬","user_icon":"","lottery_status":0},{"uid":"36296676","user_name":"桜菓酱","user_icon":"","lottery_status":0},{"uid":"23050896","user_name":"DCLorenz","user_icon":"","lottery_status":0},{"uid":"10917785","user_name":"本想给你","user_icon":"","lottery_status":0},{"uid":"6075156","user_name":"清楚型大豆子","user_icon":"","lottery_status":2},{"uid":"33557373","user_name":"金吉拉贩卖姬","user_icon":"","lottery_status":2}]'
+)
+
 export default {
   name: 'Lottery',
   components: {
@@ -114,9 +122,11 @@ export default {
     LotteryBox,
     ConfigControl,
     UserItem,
-    StartStopButton
+    StartStopButton,
+    ExecuteButton
   },
   data() {
+    window.debug = this
     return {
       // 是否已经登录 控制显示登录页或者应用页
       isLogin: true,
@@ -155,7 +165,7 @@ export default {
        * 当前参与抽奖的所有人的信息
        * @type {api.MemberInfo[]}
        */
-      members: []
+      members: MEMBERS_INIT
     }
   },
   created() {
@@ -210,6 +220,8 @@ export default {
       })
     },
     // 上方的消息框添加一条消息 自动删除最上面的消息
+    // loading为true时，消息会呈现加载中状态
+    // 通过返回的message，将loading改为false时，加载状态会取消
     addMessage(text, loading = false) {
       const message = {
         id: this.nextMessageId,
@@ -301,6 +313,9 @@ export default {
               user_icon: changeBilibiliImageToProxy(item.user_icon)
             }
           })
+        } else {
+          // 内容为空的时候 后端返回null而不是空列表
+          this.members = []
         }
       } catch (err) {
         console.error(err)
@@ -397,6 +412,12 @@ export default {
   z-index: 104;
   left: calc(50vw - 807px);
   top: calc(50vh - 200px);
+}
+.lottery-main-execute-button {
+  position: absolute;
+  z-index: 104;
+  left: calc(50vw - 800px);
+  top: calc(50vh + 60px);
 }
 
 .lottery-main-message {

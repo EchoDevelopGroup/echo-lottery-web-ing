@@ -37,6 +37,7 @@ export default {
   width: 220px;
   height: 220px;
   cursor: pointer;
+  transition: transform 0.2s;
 }
 .start-button-img,
 .stop-button-img {
@@ -63,4 +64,11 @@ export default {
   z-index: 111;
   transform: scale(1);
 }
+.start-stop-button:hover {
+  transform: scale(1.1);
+}
+/* .start-button-img:hover,
+.start-stop-button.active .stop-button-img:hover {
+  transform: scale(1.1);
+} */
 </style>
