@@ -88,7 +88,7 @@ export function processBattle(
   acceptableMemberList
 ) {
   return request({
-    url: '/lottery/start',
+    url: '/lottery/battle/royale',
     method: 'post',
     data: {
       lottery_pattern: lotteryPattern,

@@ -1,7 +1,7 @@
 <template>
   <div class="execute-button">
-    <div class="execute-button-through"></div>
-    <div class="execute-button-half"></div>
+    <div class="execute-button-through" @click="$emit('execute-through')"></div>
+    <div class="execute-button-half" @click="$emit('execute-half')"></div>
   </div>
 </template>
 

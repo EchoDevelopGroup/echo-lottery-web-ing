@@ -2,6 +2,7 @@
  * 从后往前找首个不是neddle的字符的位置
  * @param {string} str 被查找字符串
  * @param {string} needle 被查找的字符
+ * @returns {number} 位置
  */
 export function lastCharBegins(str, needle) {
   for (let i = str.length - 1; i >= 0; i--) {
@@ -16,6 +17,7 @@ export function lastCharBegins(str, needle) {
  * 检查字符串末尾含有多少个needle
  * @param {string} str 被查找字符串
  * @param {string} needle 被查找的字符
+ * @returns {number} 个数
  */
 export function lastCharLength(str, needle) {
   return str.length - lastCharBegins(str, needle)
@@ -25,6 +27,7 @@ export function lastCharLength(str, needle) {
  * 移除字符末尾的若干个needle
  * @param {string} str 被查找字符串
  * @param {string} needle 被查找的字符
+ * @returns {string} 新字符串
  */
 export function removeLastChars(str, needle) {
   return str.substr(0, str.length - lastCharLength(str, needle))
@@ -36,6 +39,7 @@ export function removeLastChars(str, needle) {
  * @param {string} needle 被查找的字符
  * @param {number} mod 循环长
  * @param {number} offset 个数偏移
+ * @returns {string} 新字符串
  */
 export function iterateModifyNeedleCount(str, needle, mod, offset) {
   const lastLen = lastCharLength(str, needle) - offset
@@ -46,6 +50,7 @@ export function iterateModifyNeedleCount(str, needle, mod, offset) {
 /**
  * 把URL转成代理后的URL
  * @param {string} url B站头像URL
+ * @returns {string} 代理后的URL
  */
 export function changeBilibiliImageToProxy(url) {
   if (!url) {
@@ -59,5 +64,25 @@ export function changeBilibiliImageToProxy(url) {
   } else {
     console.warn('[Proxy] url 无法识别: ', url)
     return url
+  }
+}
+
+/**
+ * 给定member数组 把其中所有的头像更改为代理地址
+ * @param {MemberInfo[]} members 输入
+ * @returns {MemberInfo[]} 输出
+ */
+export function modifyUserIconWithProxy(members) {
+  if (members) {
+    // 有内容的时候 把每一个的user_icon换成代理后的
+    return members.map(item => {
+      return {
+        ...item,
+        user_icon: changeBilibiliImageToProxy(item.user_icon)
+      }
+    })
+  } else {
+    // 内容为空的时候 后端返回null而不是空列表
+    return []
   }
 }
