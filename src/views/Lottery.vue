@@ -112,6 +112,7 @@ import * as api from '@/api'
 import { mapMutations, mapActions } from 'vuex'
 import { modifyUserIconWithProxy } from '@/util'
 import { now, nextWeek } from '@/util'
+import { zhCN as lang } from '@/lang'
 
 // 消息加载状态下最多几个点
 const DOT_COUNT_MOD = 3
@@ -192,11 +193,9 @@ export default {
   mounted() {
     this.setClock(1000)
     if (!this.runAutoLogin) {
-      this.addMessage(
-        '欢迎回来，黑桃影大小姐，请在下方的输入框输入您的用户名和密码以登录'
-      )
+      this.addMessage(lang.inputLoginTips)
     }
-    this.addMessage('如果界面大小不合适，可以按住"Ctrl"+"滚轮"调整大小哦')
+    this.addMessage(lang.scaleScreenTips)
   },
   beforeDestroy() {
     this.clearClock()
@@ -294,12 +293,10 @@ export default {
         }
         this.saveLogin()
         this.isLogin = true
-        // this.$message.success('登录成功')
-        this.addMessage('登录成功！欢迎回来，黑桃影大小姐')
+        this.addMessage(lang.loginSuccessTips)
       } catch (err) {
-        console.error('[Lottery/handleLoine]', err)
-        // this.$message.error('登录失败: ' + err.message)
-        this.addMessage('登录失败: ' + err.message)
+        console.error('[Lottery/handleLogin]', err)
+        this.addMessage(lang.loginFailedTips(err))
       }
       this.loginLoading = false
     },
@@ -307,37 +304,37 @@ export default {
     async handleStart() {
       try {
         this.addMessage(
-          `只抓弹幕发送"${this.config.attendKeyword}"并且粉丝等级在${this.config.medalLevel}级或以上的人`
+          lang.pressStartTips(this.config.attendKeyword, this.config.medalLevel)
         )
-        const messgge = this.addMessage('正在准备从弹幕中抓人', true)
+        const messgge = this.addMessage(lang.pressStartTips2, true)
         await api.startProcess(
           this.config.attendKeyword,
           this.config.medalLevel
         )
         messgge.loading = false
-        this.addMessage('已经开始抓人...', true)
+        this.addMessage(lang.pressStartTips3, true)
 
         // 设置开始抓人状态为真 此时开始loadMembers函数会被定时调用
         this.isCatching = true
       } catch (err) {
-        console.error(err)
-        this.addMessage('启动捕捉失败了，原因是: ' + err.message)
+        console.error('[Lottery/handleStart]', err)
+        this.addMessage(lang.startFailedTips(err))
       }
     },
     // 结束 用户点击结束按钮时调用
     async handleStop() {
       try {
         this.stopAllMessageLoading()
-        const message = this.addMessage('正在结束抓人', true)
+        const message = this.addMessage(lang.pressStopTips1, true)
         await api.stopProcess()
         message.loading = false
-        this.addMessage('结束成功')
+        this.addMessage(lang.pressStopTips2)
 
         // 此时将不会继续查人
         this.isCatching = false
       } catch (err) {
-        console.error(err)
-        this.addMessage('结束捕捉失败了，原因是: ' + err.message)
+        console.error('[Lottery/handleStop]', err)
+        this.addMessage(lang.stopFailedTips(err))
       }
     },
 
@@ -347,29 +344,23 @@ export default {
         const members = await api.getLotteryMemberList()
         this.members = modifyUserIconWithProxy(members)
       } catch (err) {
-        console.error(err)
-        this.addMessage(
-          '没能成功读取参与名单，原因是: ' + err.message + '，自动重试'
-        )
+        console.error('[Lottery/loadMembers]', err)
+        this.addMessage(lang.loadMembersFailedTips(err))
       }
     },
 
     // 检查能否开鲨
     checkExecute() {
       if (this.isExecuting) {
-        this.addMessage('大小姐，前一轮还没鲨完，稍等一下哦？')
+        this.addMessage(lang.repeatExecutingTips)
         return false
       }
       if (this.isCatching) {
-        this.addMessage(
-          '大小姐，还没有停止抓人，不能开始鲨人哦？要先抓够数了再鲨。'
-        )
+        this.addMessage(lang.executingBeforeStopTips)
         return false
       }
       if (this.members.length <= this.config.championNumber) {
-        this.addMessage(
-          '大小姐，现在抓到的人还太少，不能开始鲨人哦？要先抓够数了再鲨。'
-        )
+        this.addMessage(lang.executingBeforeEnoughMembersTips)
         return false
       }
       return true
@@ -396,7 +387,8 @@ export default {
         )
         this.members = modifyUserIconWithProxy(members)
       } catch (err) {
-        this.addMessage('鲨人(一次性)失败，原因是: ' + err.message)
+        console.error('[Lottery/handleExecuteThrough]', err)
+        this.addMessage(lang.executeThroughFailedTips(err))
       }
       this.isExecuting = false
     },
@@ -421,7 +413,8 @@ export default {
         )
         this.members = modifyUserIconWithProxy(members)
       } catch (err) {
-        this.addMessage('鲨人(一半)失败，原因是: ' + err.message)
+        console.error('[Lottery/handleExecuteHalf]', err)
+        this.addMessage(lang.executeHalfFailedTips(err))
       }
       this.isExecuting = false
     }
