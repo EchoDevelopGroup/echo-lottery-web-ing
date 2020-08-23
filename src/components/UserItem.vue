@@ -1,5 +1,9 @@
 <template>
-  <li class="user-item" :class="{ small: isSmall }">
+  <li
+    class="user-item"
+    :class="{ small: isSmall, killed }"
+    @click="handleClick"
+  >
     <div class="user-item-avatar-box" :class="{ small: isSmall }">
       <img :src="avatar" alt="头像" class="user-item-avatar" v-if="!isSmall" />
       <div class="user-item-status"></div>
@@ -42,11 +46,33 @@ export default {
         return val === 'normal' || val === 'small'
       },
       default: 'normal'
+    },
+    canKill: {
+      type: Boolean,
+      default: false
+    }
+  },
+  data() {
+    return {
+      killed: false
     }
   },
   computed: {
     isSmall() {
       return this.size === 'small'
+    }
+  },
+  methods: {
+    handleClick() {
+      if (this.canKill) {
+        this.killed = true
+        setTimeout(() => {
+          this.killed = false
+          this.$emit('kill')
+        }, 950)
+      } else {
+        this.$emit('kill-fail')
+      }
     }
   }
 }
@@ -132,5 +158,18 @@ export default {
   background-image: url('~@/assets/name-tag.png');
   background-size: 100% 100%;
   background-repeat: no-repeat;
+}
+
+@keyframes kill-drop {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-10px, 200px) rotate(-15deg);
+    opacity: 0;
+  }
+}
+.user-item.killed {
+  animation: kill-drop 1s ease 0s;
 }
 </style>

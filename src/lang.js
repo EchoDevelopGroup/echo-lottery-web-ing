@@ -1,3 +1,9 @@
+export const deathrattle = ['杀死了', '处刑了', '结束了生命', '榨干了']
+
+export function randomDeathrattle() {
+  return deathrattle[Math.floor(Math.random() * deathrattle.length)]
+}
+
 export const zhCN = {
   // 没有设置自动登录、进入页面时 要求用户输入用户名密码的提示
   inputLoginTips:
@@ -36,5 +42,16 @@ export const zhCN = {
   // 鲨人操作失败提示 对应点击左侧的一次鲨到底
   executeThroughFailedTips: err => `鲨人(一次性)失败，原因是: ${err.message}`,
   // 鲨人操作失败提示 对应点击右侧的鲨一半
-  executeHalfFailedTips: err => `鲨人(一半)失败，原因是: ${err.message}`
+  executeHalfFailedTips: err => `鲨人(一半)失败，原因是: ${err.message}`,
+  // 在抓人过程中选择刑具的提示
+  selectInstrumentWhileExecutingTips: '大小姐，抓人的过程中不能处刑哦？',
+  // 选择刑具提示
+  selectInstrumentTips: '按下"ESC"可以取消掉刑具哦',
+  // 在抓人过程中处刑的提示 应该不会发生这种情况 但是保险点
+  executingWhileCatchingTips: '大小姐，抓人的过程中不能处刑哦？',
+  // 抓到的人太少而不能处刑
+  executingWhilePeopleNotEnough: '大小姐，已经没多少人了，不能再处刑了',
+  // 处刑消息
+  executingTips: (u, instrument) =>
+    `${u.user_name}被黑桃影用${instrument.alt}${randomDeathrattle()}`
 }

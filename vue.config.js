@@ -34,5 +34,17 @@ module.exports = {
       //   changeOrigin: true
       // }
     }
+  },
+  chainWebpack: config => {
+    // 添加cur和ico文件的loader
+    config.module
+      .rule('cursors')
+      .test(/\.(cur|ico)(\?.*)?$/)
+      .use('file-loader')
+      .loader('file-loader')
+      .options({
+        name: 'img/[name].[hash:8].[ext]'
+      })
+      .end()
   }
 }

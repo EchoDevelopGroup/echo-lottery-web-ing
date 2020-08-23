@@ -9,7 +9,7 @@
     </lottery-background>
 
     <!-- 全局居中的主题框 -->
-    <div class="lottery-main">
+    <div class="lottery-main" :class="[currentInstrumentName]">
       <!-- 中心框上方的参与指令 -->
       <span class="lottery-main-command-display"
         ><b>参与指令</b>: {{ config.attendKeyword }}</span
@@ -40,6 +40,26 @@
           </div>
         </template>
 
+        <!-- 刑具 -->
+        <template #instruments>
+          <div class="lottery-instrument-list">
+            <div
+              class="lottery-instrument-item"
+              v-for="item in instruments"
+              :key="item.id"
+            >
+              <img
+                :src="item.url"
+                :alt="item.alt"
+                :title="item.alt"
+                class="lottery-instrument-img"
+                :class="{ active: item.active }"
+                @click="handleSelectInstrument(item)"
+              />
+            </div>
+          </div>
+        </template>
+
         <!-- 底部的粉色框 显示人员信息 -->
         <template #default>
           <!-- 登录成功后的页面 -->
@@ -51,6 +71,9 @@
                 :name="u.user_name"
                 :avatar="u.user_icon"
                 :size="isTooManyPeople ? 'small' : 'normal'"
+                :can-kill="isSelectAnyInstrument && canKill"
+                @kill-fail="handleKillFail()"
+                @kill="handleKill(u)"
               />
             </ul>
           </div>
@@ -113,6 +136,8 @@ import { mapMutations, mapActions } from 'vuex'
 import { modifyUserIconWithProxy } from '@/util'
 import { now, nextWeek } from '@/util'
 import { zhCN as lang } from '@/lang'
+import instrumentPliersIcon from '@/assets/cursors/instruments-pliers.png'
+import instrumentCatIcon from '@/assets/cursors/instruments-cat.png'
 
 // 消息加载状态下最多几个点
 const DOT_COUNT_MOD = 3
@@ -152,13 +177,34 @@ export default {
         // 粉丝牌等级要求
         medalLevel: 21
       },
+
       // 在登录页面输入的用户名和密码
       login: {
         username: '',
         password: '',
         autoLogin: false // 仅仅表示选择框是否为真
       },
+      // 是否要执行自动登录程序
       runAutoLogin: false, // 控制逻辑 created时根据store状态确定是否为真
+
+      // 所有的刑具
+      instruments: [
+        {
+          id: 1,
+          active: false,
+          name: 'pliers',
+          alt: '小钳钳',
+          url: instrumentPliersIcon
+        },
+        {
+          id: 2,
+          active: false,
+          name: 'cat',
+          alt: '猫爪爪',
+          url: instrumentCatIcon
+        }
+      ],
+
       // 上方显示的所有消息
       messages: [],
       nextMessageId: 1,
@@ -172,6 +218,8 @@ export default {
       isProcessing: false,
       // 是否正在鲨人（非重入锁）
       isExecuting: false,
+      // 是否提示过ESC
+      isShowedESC: false,
       /**
        * 当前参与抽奖的所有人的信息
        * @type {api.MemberInfo[]}
@@ -180,6 +228,7 @@ export default {
     }
   },
   created() {
+    window.addEventListener('keydown', this.handleKeyDown)
     this.loadLogin()
     this.login.username = this.$store.getters.username
     this.login.password = this.$store.getters.password
@@ -198,11 +247,31 @@ export default {
     this.addMessage(lang.scaleScreenTips)
   },
   beforeDestroy() {
+    window.removeEventListener('keydown', this.handleKeyDown)
     this.clearClock()
   },
   computed: {
+    // 是否人数较多而不显示人数
     isTooManyPeople() {
       return this.members.length > MAX_FULL_DISPLAY_PEOPLE_NUMBER
+    },
+    // 是否选中了任何一种刑具
+    isSelectAnyInstrument() {
+      return this.instruments.reduce((prev, it) => prev || it.active, false)
+    },
+    // 当前选择的刑具
+    currentInstrument() {
+      return this.instruments.find(it => it.active)
+    },
+    // 当前刑具的别名
+    currentInstrumentName() {
+      return this.currentInstrument ? this.currentInstrument.name : ''
+    },
+    // 是否可以鲨人
+    canKill() {
+      return (
+        !this.isCatching && this.members.length > this.config.championNumber
+      )
     }
   },
   methods: {
@@ -231,14 +300,17 @@ export default {
     // 定时时钟
     clock() {
       // 修改消息中点的个数
-      if (this.loadingLastMessage) {
-        this.modifyMessageLoadingDots()
-      }
+      this.modifyMessageLoadingDots()
 
       // 获取抓人的所有人状态
       this.catchingCounter = (this.catchingCounter + 1) % DOT_COUNT_MOD
       if (this.catchingCounter === 0 && this.isCatching) {
         this.loadMembers()
+      }
+    },
+    handleKeyDown(evt) {
+      if (evt.keyCode === 27) {
+        this.handleCancelInstrument()
       }
     },
     // 把最后一条消息修改点的个数
@@ -303,6 +375,7 @@ export default {
     // 开始 用户点击开始按钮时调用
     async handleStart() {
       try {
+        this.handleCancelInstrument()
         this.addMessage(
           lang.pressStartTips1(
             this.config.attendKeyword,
@@ -420,6 +493,41 @@ export default {
         this.addMessage(lang.executeHalfFailedTips(err))
       }
       this.isExecuting = false
+    },
+    // 选中一个刑具
+    handleSelectInstrument(instrument) {
+      if (this.isCatching) {
+        this.addMessage(lang.selectInstrumentWhileExecutingTips)
+        return
+      }
+      this.instruments.forEach(it => {
+        it.active = it.id === instrument.id
+      })
+      if (!this.isShowedESC) {
+        this.isShowedESC = true
+        this.addMessage(lang.selectInstrumentTips)
+      }
+    },
+    // 取消选择刑具
+    handleCancelInstrument() {
+      this.instruments.forEach(it => {
+        it.active = false
+      })
+    },
+    // 并没法处刑的时候
+    handleKillFail() {
+      if (this.isSelectAnyInstrument) {
+        if (this.isCatching) {
+          this.addMessage(lang.executingWhileCatchingTips)
+        } else if (this.members.length <= this.config.championNumber) {
+          this.addMessage(lang.executingWhilePeopleNotEnough)
+        }
+      }
+    },
+    // 手动鲨人
+    handleKill(u) {
+      this.addMessage(lang.executingTips(u, this.currentInstrument))
+      this.members = this.members.filter(it => it.uid !== u.uid)
     }
   }
 }
@@ -483,7 +591,7 @@ export default {
   position: absolute;
   z-index: 101;
   left: calc((100vw - 1028px) / 2 + 80px);
-  top: calc((100vh - 828px) / 2 - 50px);
+  top: calc((100vh - 846px) / 2 - 50px);
   font-family: 'zhscnmt', 'Helvetica Neue', Helvetica, 'PingFang SC',
     'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
   font-size: 40px;
@@ -537,5 +645,42 @@ export default {
 }
 .lottery-main-users.small {
   grid-template-rows: repeat(20, 38px);
+}
+
+.lottery-main.pliers {
+  cursor: url('~@/assets/cursors/instruments-pliers.cur'),
+    url('~@/assets/cursors/instruments-pliers.ico'),
+    url('~@/assets/cursors/instruments-pliers.png'), auto;
+}
+.lottery-main.cat {
+  cursor: url('~@/assets/cursors/instruments-cat.cur'),
+    url('~@/assets/cursors/instruments-cat.ico'),
+    url('~@/assets/cursors/instruments-cat.png'), auto;
+}
+.lottery-instrument-list {
+  display: flex;
+  flex-direction: row;
+}
+.lottery-instrument-item {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+.lottery-instrument-img.active {
+  display: none;
+  max-width: 40px;
+  max-height: 40px;
+}
+.lottery-instrument-img {
+  max-width: 40px;
+  max-height: 40px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.lottery-instrument-img:hover {
+  transform: scale(1.15);
+}
+.lottery-instrument-img.active {
+  display: none;
 }
 </style>
