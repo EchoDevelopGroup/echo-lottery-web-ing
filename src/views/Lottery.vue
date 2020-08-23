@@ -648,13 +648,13 @@ export default {
 }
 
 .lottery-main.pliers {
-  cursor: url('~@/assets/cursors/instruments-pliers.cur'),
-    url('~@/assets/cursors/instruments-pliers.ico'),
+  cursor: url('~@/assets/cursors/instruments-pliers.ico'),
+    url('~@/assets/cursors/instruments-pliers.cur'),
     url('~@/assets/cursors/instruments-pliers.png'), auto;
 }
 .lottery-main.cat {
-  cursor: url('~@/assets/cursors/instruments-cat.cur'),
-    url('~@/assets/cursors/instruments-cat.ico'),
+  cursor: url('~@/assets/cursors/instruments-cat.ico'),
+    url('~@/assets/cursors/instruments-cat.cur'),
     url('~@/assets/cursors/instruments-cat.png'), auto;
 }
 .lottery-instrument-list {
