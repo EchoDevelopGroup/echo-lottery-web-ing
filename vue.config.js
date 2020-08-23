@@ -13,7 +13,7 @@ function makeList(list) {
 }
 
 module.exports = {
-  publicPath: '.',
+  publicPath: '/',
   devServer: {
     proxy: {
       '/echo-api': {

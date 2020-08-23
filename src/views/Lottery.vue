@@ -70,6 +70,12 @@
               placeholder="密码"
             ></el-input>
 
+            <el-checkbox
+              class="lottery-main-login-auto"
+              v-model="login.autoLogin"
+              >7天内免登录</el-checkbox
+            >
+
             <el-button
               class="lottery-main-login-button"
               type="primary"
@@ -103,8 +109,9 @@ import UserItem from '@/components/UserItem'
 import StartStopButton from '@/components/StartStopButton'
 import ExecuteButton from '@/components/ExecuteButton'
 import * as api from '@/api'
-import { mapMutations } from 'vuex'
+import { mapMutations, mapActions } from 'vuex'
 import { modifyUserIconWithProxy } from '@/util'
+import { now, nextWeek } from '@/util'
 
 // 消息加载状态下最多几个点
 const DOT_COUNT_MOD = 3
@@ -128,7 +135,7 @@ export default {
   data() {
     return {
       // 是否已经登录 控制显示登录页或者应用页
-      isLogin: true,
+      isLogin: false,
       // 登录页面的登录按钮前面是否出现加载动效
       loginLoading: false,
       // 组件内全局定时器
@@ -147,8 +154,10 @@ export default {
       // 在登录页面输入的用户名和密码
       login: {
         username: '',
-        password: ''
+        password: '',
+        autoLogin: false // 仅仅表示选择框是否为真
       },
+      runAutoLogin: false, // 控制逻辑 created时根据store状态确定是否为真
       // 上方显示的所有消息
       messages: [],
       nextMessageId: 1,
@@ -170,12 +179,24 @@ export default {
     }
   },
   created() {
-    this.setClock(1000)
+    this.loadLogin()
+    this.login.username = this.$store.getters.username
+    this.login.password = this.$store.getters.password
+
+    // 保存的自动登录有效期还没过 那么执行自动登录
+    if (now() < this.$store.getters.autoLogin) {
+      this.runAutoLogin = true
+      this.handleLogin()
+    }
   },
   mounted() {
-    this.addMessage(
-      '欢迎回来，黑桃影大小姐，请在下方的输入框输入您的用户名和密码以登录'
-    )
+    this.setClock(1000)
+    if (!this.runAutoLogin) {
+      this.addMessage(
+        '欢迎回来，黑桃影大小姐，请在下方的输入框输入您的用户名和密码以登录'
+      )
+    }
+    this.addMessage('如果界面大小不合适，可以按住"Ctrl"+"滚轮"调整大小哦')
   },
   beforeDestroy() {
     this.clearClock()
@@ -188,7 +209,12 @@ export default {
   methods: {
     ...mapMutations({
       setUsername: 'setUsername',
-      setPassword: 'setPassword'
+      setPassword: 'setPassword',
+      setAutoLogin: 'setAutoLogin'
+    }),
+    ...mapActions({
+      loadLogin: 'loadLogin',
+      saveLogin: 'saveLogin'
     }),
     // 设置当前时钟 定时调用当前实例的clock方法
     setClock(delay) {
@@ -261,6 +287,12 @@ export default {
         await api.login(username, password)
         this.setUsername(username)
         this.setPassword(password)
+        // 如果是created中触发的自动登录 则不修改登录有效期
+        if (!this.runAutoLogin) {
+          // 如果是手动登录的，根据是否勾选 更新自动登录有效期
+          this.setAutoLogin(this.login.autoLogin ? nextWeek() : 0)
+        }
+        this.saveLogin()
         this.isLogin = true
         // this.$message.success('登录成功')
         this.addMessage('登录成功！欢迎回来，黑桃影大小姐')
@@ -474,6 +506,9 @@ export default {
 .lottery-main-login-password {
   width: 400px;
   margin-bottom: 20px;
+}
+.lottery-main-login-auto {
+  margin-bottom: 10px;
 }
 
 .lottery-main-action-button {
