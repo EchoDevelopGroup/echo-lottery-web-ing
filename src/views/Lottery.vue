@@ -146,11 +146,11 @@ export default {
         // 0=普通 1=头像
         lotteryPattern: 1,
         // 抽奖人数
-        championNumber: 8,
+        championNumber: 2,
         // 参与指令
-        attendKeyword: 'Echo',
+        attendKeyword: '',
         // 粉丝牌等级要求
-        medalLevel: 5
+        medalLevel: 21
       },
       // 在登录页面输入的用户名和密码
       login: {
@@ -304,7 +304,10 @@ export default {
     async handleStart() {
       try {
         this.addMessage(
-          lang.pressStartTips(this.config.attendKeyword, this.config.medalLevel)
+          lang.pressStartTips1(
+            this.config.attendKeyword,
+            this.config.medalLevel
+          )
         )
         const messgge = this.addMessage(lang.pressStartTips2, true)
         await api.startProcess(

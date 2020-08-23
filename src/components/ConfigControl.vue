@@ -5,8 +5,8 @@
     <div>
       <el-switch
         v-model="isAvatarMode"
-        active-text="普通"
-        inactive-text="头像"
+        active-text="头像"
+        inactive-text="普通"
       />
     </div>
 
