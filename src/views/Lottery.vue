@@ -111,8 +111,19 @@
       </lottery-box>
 
       <!-- 右侧的两个人框 -->
-      <task-box class="lottery-main-done-list"></task-box>
-      <task-box class="lottery-main-undone-list"></task-box>
+      <task-box
+        class="lottery-main-done-list"
+        title="舰长头像-已完成"
+        :counter="`${tasks.done_list.length}/${tasks.done_list.length + tasks.undone_list.length}`"
+        :list="tasks.done_list"
+      ></task-box>
+
+      <task-box
+        class="lottery-main-undone-list"
+        title="舰长头像-未完成"
+        :counter="`${tasks.undone_list.length}/${tasks.done_list.length + tasks.undone_list.length}`"
+        :list="tasks.undone_list"
+      ></task-box>
 
       <!-- 左侧的配置框 -->
       <config-box class="lottery-main-config">
@@ -224,7 +235,12 @@ export default {
        * 当前参与抽奖的所有人的信息
        * @type {api.MemberInfo[]}
        */
-      members: []
+      members: [],
+      //舰长头像绘制进度
+      tasks:{
+        done_list: [],
+        undone_list:[]
+      }
     }
   },
   created() {
@@ -238,6 +254,9 @@ export default {
       this.runAutoLogin = true
       this.handleLogin()
     }
+
+    // 加载舰长头像绘制进度
+    this.loadTasks()
   },
   mounted() {
     this.setClock(1000)
@@ -408,6 +427,8 @@ export default {
 
         // 此时将不会继续查人
         this.isCatching = false
+        //结束抓取后刷新舰长列表
+        this.loadTasks()
       } catch (err) {
         console.error('[Lottery/handleStop]', err)
         this.addMessage(lang.stopFailedTips(err))
@@ -528,6 +549,17 @@ export default {
     handleKill(u) {
       this.addMessage(lang.executingTips(u, this.currentInstrument))
       this.members = this.members.filter(it => it.uid !== u.uid)
+    },
+    // 加载舰团头像绘制进度
+    async loadTasks() {
+      try{
+        const tasks = await api.getMemberSchedule()
+        this.tasks = tasks
+      }catch (err) {
+        console.error('[Lottery/handleStart]', err)
+        this.addMessage(lang.startFailedTips(err))
+      }
+
     }
   }
 }

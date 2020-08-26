@@ -1,20 +1,49 @@
 <template>
   <div class="task-box">
     <!-- 左上角的人数计数 -->
-    <span class="task-box-counter">10/189</span>
+    <span class="task-box-counter">{{ counter }}</span>
     <!-- 右上角的标题 -->
-    <span class="task-box-title">舰长头像-已完成</span>
+    <span class="task-box-title">{{ title }}</span>
 
     <!-- 中间的人物显示区 -->
     <div class="task-box-main">
-      <slot></slot>
+      <!-- <slot></slot>-->
+      <ul class="task-box-main-list">
+        <li
+          v-for="(item, index) in list"
+          :key="item.uid"
+          :class="
+            index % 2 === 0
+              ? 'task-box-main-list-item-even'
+              : 'task-box-main-list-item-odd'
+          "
+        >
+          {{ item.user_name }}
+        </li>
+      </ul>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'TaskBox'
+  name: 'TaskBox',
+  props: {
+    counter: {
+      type: String,
+      default: '0/0'
+    },
+    title: {
+      type: String,
+      default: '舰长头像'
+    },
+    list: {
+      type: Array,
+      default: () => {
+        return []
+      }
+    }
+  },
 }
 </script>
 
@@ -45,5 +74,25 @@ export default {
   width: 400px;
   height: 210px;
   background-color: #ffb0d0;
+
+  /* 滚动显示舰长 */
+  overflow-y: scroll;
+}
+.task-box-main-list li {
+  /* 花鸡设计的原尺寸傻大傻大的 改一下 */
+  /*  height: 40px;
+    line-height: 40px;
+    font-size: 29px;*/
+  height: 30px;
+  line-height: 30px;
+  padding-left: 10px;
+  font-size: 20px;
+  font-family: "Microsoft YaHei";
+}
+.task-box-main-list-item-odd {
+  background: #ffb0d0;
+}
+.task-box-main-list-item-even {
+  background: #ff80b3;
 }
 </style>
